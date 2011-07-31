@@ -54,6 +54,8 @@ module RubyScript
           "str(#{obj.to_json})"
         when Integer
           obj.to_s
+        when true, false
+          obj.inspect
         else
           raise obj.inspect
         end
@@ -143,8 +145,20 @@ module RubyScript
 
       def on_getglobal(name)
         @buffer << "var res = globals[#{js name}]"
-        @buffer << "if (res) res = res.value";
+        @buffer << "if (res) res = res.value"
         stack_push('res')
+      end
+
+      def on_setglobal(name)
+        value = stack_pop
+        @buffer << <<-JS
+          var res = globals[#{js name}];
+          if (!res) {
+            globals[#{js name}] = { value: #{value} }
+          } else {
+            res.value = #{value}
+          }
+        JS
       end
 
       def on_send(name, argc, block, flag, ic)
