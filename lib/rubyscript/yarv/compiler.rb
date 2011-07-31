@@ -120,7 +120,7 @@ module RubyScript
         when 2
           'cref.klass'
         when 3
-          raise "not yet"
+          'cref_.klass'
         end
       end
 
@@ -225,6 +225,20 @@ module RubyScript
 
       def on_leave
         @buffer << "return #{stack_pop}"
+      end
+
+      def on_getinlinecache(label, num) end
+      def on_setinlinecache(num) end
+
+      def on_getconstant(name)
+        stack_push "const_get(Object, #{js name});"
+      end
+
+      def on_setconstant(name)
+        klass = stack_pop
+        id = js :"const_#{name}"
+        obj = stack_pop
+        @buffer << "#{klass}.prototype[#{id}] = #{obj}"
       end
 
       {
