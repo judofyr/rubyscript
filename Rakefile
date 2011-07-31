@@ -9,7 +9,7 @@ namespace :test do
     puts
     fails = Hash.new(0)
     BOOTSTRAP_TESTS.each do |test|
-      IO.popen("bin/rubyscript #{test}") do |io|
+      IO.popen("bin/rubyscript-node #{test}") do |io|
         io.each_line do |line|
           if line.strip != "ok"
             fails[test] += 1

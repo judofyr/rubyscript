@@ -18,7 +18,7 @@ Then run:
 
     $ cat test.rb
     p 123
-    $ bin/rubyscript test.rb
+    $ bin/rubyscript-node test.rb
     123
 
 
