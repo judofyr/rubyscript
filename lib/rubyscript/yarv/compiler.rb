@@ -66,7 +66,6 @@ module RubyScript
         name, filename, filepath, line_no, type, locals, args,
         catch_table, bytecode = iseq
 
-        p args
         raise "can't handle advargs" unless args.is_a?(Integer)
 
         params = ['block']

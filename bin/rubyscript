@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby
+
+tried = 0
+lib = File.dirname(__FILE__) + '/../lib'
+
+begin
+  require "rubyscript"
+rescue LoadError
+  $LOAD_PATH << lib
+  require "rubyscript"
+end
+
+raise "RubyScript requires 1.9.2+" if !defined?(RubyVM::InstructionSequence)
+
+files = %w[base yarv/core yarv/node_core yarv/runner].
+  map { |x| "#{lib}/rubyscript/#{x}.js" }
+
+commands = %w[run build]
+
+if commands.include?(ARGV[0])
+  command = ARGV.shift
+else
+  command = "run"
+end
+
+case command
+when "run"
+  exec __FILE__ + '-node', *ARGV
+when "build"
+  require "json"
+
+  switches = {}
+  source = nil
+  until ARGV.empty?
+    s = ARGV.shift
+    if s[0] == ?-
+      letter = s.tr('-', '')[0]
+      switches[letter] = ARGV.shift
+    else
+      raise "Only one source allowed" if source
+      source = s
+    end
+  end
+  files.each { |file| puts File.read(file) }
+
+  iseq = RubyVM::InstructionSequence.compile(File.read(source), source, ".", 1).to_a
+  compiler = RubyScript::YARV::Compiler.new
+  compiler.compile(iseq)
+
+  puts <<-JS
+    (function(R) {
+      var core = R.YARV.NodeCore(R.YARV.Core(R.Base()));
+      var runner = new R.YARV.Runner(core);
+      runner.eval(#{compiler.to_s.to_json});
+    })(RubyScript);
+  JS
+end
