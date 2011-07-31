@@ -1,0 +1,31 @@
+#!/usr/bin/env node 
+
+// Example program for running Ruby code
+
+var Compiler = require('../lib/rubyscript/yarv/compiler'),
+    Runner = require('../lib/rubyscript/yarv/runner'),
+    Base = require('../lib/rubyscript/base'),
+    Core = require('../lib/rubyscript/yarv/core'),
+    NodeCore = require('../lib/rubyscript/yarv/node_core'),
+
+    c = new Compiler('ipc'),
+    base = NodeCore(Core(Base())),
+    runner = new Runner(base);
+
+runner.core.compiler = c;
+
+c.child.on('error', function() {
+  console.log('Compiler crashed');
+  process.exit();
+});
+
+c.child.on('ready', function() {
+  try {
+    var code = c.compileFile(process.argv[2]);
+    console.log(code);
+    runner.eval(code);
+  } finally {
+    c.child.kill();
+  }
+});
+
