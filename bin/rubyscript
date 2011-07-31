@@ -21,8 +21,15 @@ c.child.on('error', function() {
 
 c.child.on('ready', function() {
   try {
-    var code = c.compileFile(process.argv[2]);
-    console.log(code);
+    var file = process.argv[2];
+
+    if (file == "--debug") {
+      var debug = true;
+      file = process.argv[3];
+    }
+
+    var code = c.compileFile(file);
+    if (debug) console.log(code);
     runner.eval(code);
   } finally {
     c.child.kill();

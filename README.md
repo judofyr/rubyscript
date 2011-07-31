@@ -19,7 +19,6 @@ Then run:
     $ cat test.rb
     p 123
     $ bin/rubyscript test.rb
-    (The compiled JavaScript is printed and evaluated)
     123
 
 
