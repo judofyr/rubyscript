@@ -243,7 +243,7 @@ module RubyScript
             if  (typeof #{recv} === 'number' && typeof #{obj} === 'number') {
               res = #{recv} %s #{obj};
             } else {
-              throw 'Should invoke regular %s';
+              throw 'Should invoke regular method';
             }
           JS
           stack_push('res')
