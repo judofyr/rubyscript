@@ -21,16 +21,18 @@ c.child.on('error', function() {
 
 c.child.on('ready', function() {
   try {
-    var file = process.argv[2];
+    var args = process.argv.slice(2);
 
-    if (file == "--debug") {
+    if (args[0] == '-v') args.shift();
+    if (args[0] == '--debug') {
+      args.shift();
       var debug = true;
-      file = process.argv[3];
     }
 
+    var file = args.shift();
     var code = c.compileFile(file);
     if (debug) console.log(code);
-    runner.eval(code);
+    runner.eval(code, args);
   } finally {
     c.child.kill();
   }
