@@ -36,15 +36,14 @@ This defines the object-system of Ruby in JavaScript, including objects,
 classes, modules, inheritence, singleton classes, mixins and simple
 lookup.
 
-### `lib/rubyscript/yarv/core.js`
+### `lib/rubyscript/yarv/base.js`
 
 Extends the base with (mostly) YARV specific, rather important,
-methods. Some of these should probably be abstracted away to a
-`lib/rubyscript/core.js` so there's *only* YARV-related methods here.
+methods.
 
-### `lib/rubyscript/yarv/node_core.js`
+### `lib/rubyscript/core.js`
 
-Extends the base with Node.js specific methods.
+Extends the base with core methods (Kernel, Fixnum etc...)
 
 ### `lib/rubyscript/yarv/runner.js`
 
