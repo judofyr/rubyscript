@@ -56,6 +56,8 @@ module RubyScript
           obj.to_s
         when true, false
           obj.inspect
+        when Array
+          '[' + obj.map { |x| js(x) }.join(', ') + ']'
         else
           raise obj.inspect
         end
@@ -109,6 +111,7 @@ module RubyScript
       end
 
       def on_trace(*) end
+      def on_dup; stack_push("stack#{@sp - 1}") end
       def on_putnil; stack_push('null') end
       def on_putself; stack_push('this') end
       def on_putstring(str) stack_push(js str) end
@@ -133,6 +136,43 @@ module RubyScript
       end
 
       def on_pop; @sp -= 1 end
+
+      def on_newarray(elements)
+        arr = []
+        elements.times { arr << stack_pop }
+        stack_push("[#{arr.join(', ')}]")
+      end
+
+      def on_duparray(ary)
+        stack_push(js(ary))
+      end
+
+      def on_concatarray
+        extra = stack_pop
+        source = stack_pop
+        stack_push("#{source}.concat(#{extra})")
+      end
+
+      def on_expandarray(num, flag)
+        ary = stack_pop
+        @buffer << "var ary = ary_to_ary(#{ary})"
+
+        is_splat = flag & 1 > 0
+
+        if flag & 2 > 0
+          # post
+          raise "fail"
+        else
+          # normal: ary[num..-1], ary[num-2], ary[num-3], ..., ary[0]
+          num.times do |i|
+            stack_push("ary[#{num - i - 1}]")
+          end
+
+          if is_splat
+            stack_push("ary.slice(#{num})")
+          end
+        end
+      end
 
       def on_setlocal(id)
         @buffer << "local#{id} = #{stack_pop}"
