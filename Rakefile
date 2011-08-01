@@ -1,3 +1,4 @@
+$: << "lib"
 BOOTSTRAP_TESTS = FileList["test/bootstrap/*.rb"]
 
 task :default => :test
@@ -30,6 +31,18 @@ namespace :test do
       fails.each do |t, n|
         puts "#{n} failures in #{File.basename(t)}"
       end
+    end
+  end
+end
+
+task :check do
+  require "rubyscript"
+  meths = RubyScript::YARV::Compiler.instance_methods
+  File.readlines('opcodes').each do |line|
+    if meths.include?(:"on_#{line.strip}")
+      puts "DONE: #{line}"
+    else
+      puts "MISS: #{line}"
     end
   end
 end
