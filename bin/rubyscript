@@ -12,7 +12,7 @@ end
 
 raise "RubyScript requires 1.9.2+" if !defined?(RubyVM::InstructionSequence)
 
-files = %w[base yarv/core yarv/node_core yarv/runner].
+files = %w[base yarv/base core yarv/runner].
   map { |x| "#{lib}/rubyscript/#{x}.js" }
 
 commands = %w[run build]
@@ -49,7 +49,7 @@ when "build"
 
   puts <<-JS
     (function(R) {
-      var core = R.YARV.NodeCore(R.YARV.Core(R.Base()));
+      var core = R.Core(R.YARV.Base(R.Base()));
       var runner = new R.YARV.Runner(core);
       runner.eval(#{compiler.to_s.to_json});
     })(RubyScript);
