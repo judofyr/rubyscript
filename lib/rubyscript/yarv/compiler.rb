@@ -187,6 +187,7 @@ module RubyScript
           switch(typeof recv) {
             case 'object':
               if (recv === null) recv = NilProto;
+              if (recv.constructor === RealArray) recv = Array.prototype;
               break;
             case 'number':
               recv = FixnumProto;
